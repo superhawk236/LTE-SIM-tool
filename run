@@ -1,0 +1,22 @@
+#!/bin/bash
+start=$(date +%s.%N)
+if [ $# -ne 0  ]; then
+	cd RUN/do_simulations/
+	cp doSim1.sh temp.sh
+	sed -i 's|move|move '"${1}"'|g' ./temp.sh
+	./temp.sh
+	rm -rf ./temp.sh
+else
+	cd RUN/do_simulations/
+	./doSim1.sh
+fi
+end=$(date +%s.%N)
+dt=$(echo "$end - $start" | bc)
+dd=$(echo "$dt/86400" | bc)
+dt2=$(echo "$dt-86400*$dd" | bc)
+dh=$(echo "$dt2/3600" | bc)
+dt3=$(echo "$dt2-3600*$dh" | bc)
+dm=$(echo "$dt3/60" | bc)
+ds=$(echo "$dt3-60*$dm" | bc)
+
+printf "Total runtime: %d:%02d:%02d:%02.4f\n" $dd $dh $dm $ds

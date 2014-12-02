@@ -1,0 +1,40 @@
+#!/bin/bash
+count=1
+if [ $# = 1 ] ;then					#input foldername
+	DIRECTORY="$PWD/$1"
+	if [  -d "$DIRECTORY" ]; then			  #dir exist
+		if [ ! "$(ls -A $DIRECTORY)" ]; then      #Empty
+			echo "EMPTY"
+			mv -f *.jpg $DIRECTORY/
+			mv -f *.ods $DIRECTORY/
+			mv -f *.sim $DIRECTORY/
+		fi
+	else						#dir not exist
+	  		mkdir -p "$DIRECTORY"
+			mv -f *.jpg $DIRECTORY/
+			mv -f *.ods $DIRECTORY/
+			mv -f *.sim $DIRECTORY/	
+		fi 
+else							#use default folder name : test + num       num=1,2,3,4......
+	while [ true ]
+	do 
+		DIRECTORY="$PWD/test$count"
+		if [  -d "$DIRECTORY" ]; then
+			if [ ! "$(ls -A $DIRECTORY)" ]; then
+				echo "EMPTY"
+				mv -f *.jpg $DIRECTORY/
+				mv -f *.ods $DIRECTORY/
+				mv -f *.sim $DIRECTORY/
+				break
+			fi
+		else
+	  		mkdir -p "$DIRECTORY"
+			mv -f *.jpg $DIRECTORY/
+			mv -f *.ods $DIRECTORY/
+			mv -f *.sim $DIRECTORY/
+			break	
+		fi 
+		((count++))
+	done
+fi
+echo -e "\033[32m"The file is saved at : $DIRECTORY"\033[0m" 

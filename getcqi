@@ -1,0 +1,4 @@
+#!/bin/sh
+sed -n '/^flow*/p' RUN/do_simulations/test5/Sim_1_Multi_MY_algo_10U1C.sim |grep -oE "[^flow.*= ]+$" 2>&1 > cqi.txt
+var=$(awk '{ total += $1; count++ } END { print "avg = "total/count }' ./cqi.txt  2>&1  )
+sed -i "1s/^/$var\n/" cqi.txt

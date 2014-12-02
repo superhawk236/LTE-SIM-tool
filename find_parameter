@@ -1,0 +1,7 @@
+#!/bin/bash
+if [ $# -ne 0  ]; then
+	ag -w $1 
+	#grep -rnwI ./ -e "$1"
+else
+	echo "You need to type a string!!"
+fi

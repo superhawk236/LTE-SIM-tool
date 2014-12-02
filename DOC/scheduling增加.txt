@@ -1,0 +1,53 @@
+第一次使用可以複製lte-sim-r5_test/src/protocolStack/mac/packet-scheduler/dl-pf-packet-scheduler.cpp 和 dl-pf-packet-scheduler.h 並修改檔名以及檔案裡面的constructor名稱
+
+建議修改 : lte-sim-r5_test/RUN/do_simulations/
+	1.把 doSim.sh   裡的絕對路徑修改為相對路徑     ex : /usr/local/home/miturral/LTE-Sim/./LTE-Sim SingleCellWithI  --> ../../LTE-Sim SingleCellWithI
+	2.把 specEff.sh 裡的絕對路徑修改為相對路徑     ex : /usr/local/home/miturral/LTE-Sim/src/Simulations/TOOLS/     --> ../../TOOLS/
+
+
+
+1. 在  lte-sim-r5_test/src/protocolStack/mac/packet-scheduler/   --> 增加scheduling.cpp  and  scheduling.h檔
+2. 修改  lte-sim-r5_test/Debug/src/protocolStack/mac/packet-scheduler/subdir.mk  --> 在  CPP_SRCS +=  裡增加 scheduling.cpp  （比照檔案裡的格式）
+										 --> 在  OBJS += \    裡增加 scheduling.o    （比照檔案裡的格式）
+										 --> 在  CPP_DEPS += \裡增加 scheduling.d    （比照檔案裡的格式）
+3. 修改 lte-sim-r5_test/src/scenarios/SingleCellWithI.h 
+		switch (sched_type)
+		{
+			.
+			..
+			...
+			case 7 : 	//新增
+			downlink_scheduler_type = ENodeB::DLScheduler_My_Algo;
+  	        	std::cout << "Scheduler My Algorithm "<< std::endl;
+	        	break;
+		}
+4. 修改 lte-sim-r5_test/src/device/ENodeB.h
+	enum DLSchedulerType
+	{
+		...
+		DLScheduler_My_Algo  //新增
+	}
+5. 修改 lte-sim-r5_test/src/device/ENodeB.cpp
+		1. include 標頭檔  ex : #include "../protocolStack/mac/packet-scheduler/dl-my-algo-packet-scheduler.h"
+		2. 修改 ENodeB::SetDLScheduler (ENodeB::DLSchedulerType type)
+			{
+				case ENodeB::DLScheduler_My_Algo:                        //My ALGO新增
+      				     scheduler = new  DL_my_algo_PacketScheduler ();
+      				     scheduler->SetMacEntity (mac);
+      				     mac->SetDownlinkPacketScheduler (scheduler);
+		  		     break;	
+			}
+		
+6. 修改 lte-sim-r5_test/RUN/do_simulations/
+		-->  Graph1.sh   : 在倒數第3行的echo "plot  '$2' using 2:xtic(1) title 'PF', '$3' using 2:xtic(1) title 'MLWDF', '$4' using 2:xtic(1) title 'EXP/PF" >>$filename  增加新的參數
+			ex : echo "plot  '$2' using 2:xtic(1) title 'PF', '$3' using 2:xtic(1) title 'MLWDF', '$4' using 2:xtic(1) title 'EXP/PF','$8' using 2:xtic(1) title 'my_algo'" >>$filename
+		
+		-->  specEff.sh  ,spectral_efficiency.sh ,doSim1.sh:
+			 仿照前3個迴圈的敘述 (PF, MLWDF , EXPPF)  在下面創造自己的迴圈
+
+		-->  spectral_efficiency_comp.sh ,packet_loss_ratio.sh ,fairnessIndex_comp.sh ,thoughput_comp.sh ,delay_comp.sh :
+			1.仿照前3個迴圈的敘述 (PF, MLWDF , EXPPF)  在下面創造自己的迴圈 
+			2.仿照上面的敘述 echo PF  >> results_$8_$7.ods ...... , 新增自己的 my_algo  >> results_$8_$7.ods .......
+			3.修改  ./Graph1.sh $7_$8 PF_Y1_$8_$7.dat MLWDF_Y1_$8_$7.dat EXPPF_Y1_$8_$7.dat Cell-Spectral-Efficiency Users Spectral-Efficiency[bpsS] 新增參數 
+			 	ex : ./Graph1.sh $7_$8 PF_Y1_$8_$7.dat MLWDF_Y1_$8_$7.dat ............. Spectral-Efficiency[bpsS] MY_algo_Y1_$8_$7.dat
+			4.倒數第2行新增	rm MY_algo2_Y1_$8_$7.dat （你的演算法名稱）  

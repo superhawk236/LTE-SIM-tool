@@ -1,0 +1,18 @@
+# Create function that will run when a certain phrase is typed in terminal
+# and tab key is pressed twice
+_math_complete()
+{
+    # fill local variable with a list of completions
+    var=$(cat ./CONFIG/global_config | sed -n -e 's/^.*#define \(.*\)/\1/p') 
+    local COMPLETES=$var
+    # you can fill this variable however you want. example:
+    # ./genMathArgs.sh > ./mathArgsList
+    # local COMPLETES=`cat ./mathArgsList`
+
+    # we put the completions into $COMPREPLY using compgen
+    COMPREPLY=( $(compgen -W "$COMPLETES" -- ${COMP_WORDS[COMP_CWORD]}) )
+    return 0
+}
+
+# get completions for command 'math' from function '_math_complete()'
+complete -F _math_complete ./my_make

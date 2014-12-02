@@ -1,0 +1,28 @@
+#!/bin/bash
+source tab_complete
+
+make clean
+echo "Start my make!!!!!"
+
+for var in "$@"
+do 
+	sed -ie "s/\/\/#define $var/#define $var/g" ./src/load-parameters.h
+	echo -e "Now \033[32m$var\033[0m is defined"
+done
+	read -p "Press [Enter] key to continue..."
+	#echo -e "\033[31mNow SCHEDULER_DEBUG is defined\033[0m"
+        DIRECTORY=debug.mk
+        if [  -d "$DIRECTORY" ]; then
+        rm -rf debug.mk
+        fi
+        make 2>&1 | ./colorize | tee $DIRECTORY
+			
+	#check if the lte-sim is successfully maked.
+	if grep "Finished building target: LTE-Sim" ./debug.mk
+	then
+		echo -e "\033[32mSuccess!!!!!!!\033[0m" ;
+	else
+		echo -e "\033[31mError!!!!!!!\033[0m" ;
+	fi
+	rm -rf ./src/load-parameters.he
+	
